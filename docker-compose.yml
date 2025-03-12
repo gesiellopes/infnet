@@ -1,5 +1,9 @@
 version: '1.0'
 
+networks:
+  sb_net:
+    driver: bridge
+
 services:
   mongodb:
     image: mongo:latest
@@ -8,3 +12,15 @@ services:
       - "27017:27017"
     volumes:
       - ./mongo_data:/data/db
+    networks:
+      - sb_net
+  
+  api:
+    build: ./api
+    container_name: api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    networks:
+      - sb_net
