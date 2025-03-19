@@ -1,0 +1,71 @@
+
+networks:
+  sb_net:
+    driver: bridge
+
+services:
+
+  pyspark:
+    image: jupyter/pyspark-notebook:latest
+    container_name: pyspark
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    ports:
+      - '9999:8888'
+    volumes:
+      - ./data:/home/jovyan/work
+    networks:
+      - sb_net
+
+  spark:
+    image: docker.io/bitnami/spark:3.5
+    container_name: spark
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+    ports:
+      - '8080:8080'
+      - '7077:7077'
+    networks:
+      - sb_net
+  
+  spark-worker-1:
+    image: docker.io/bitnami/spark:3.5
+    container_name: spark-work-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+    networks:
+      - sb_net
+    depends_on:
+      - spark
+  
+  spark-worker-2:
+    image: docker.io/bitnami/spark:3.5
+    container_name: spark-work-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+    networks:
+      - sb_net
+    depends_on:
+      - spark
+    
