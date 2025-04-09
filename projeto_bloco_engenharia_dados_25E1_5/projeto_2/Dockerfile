@@ -12,6 +12,6 @@ WORKDIR /work
 RUN pip install jupyterlab -U
 RUN pip install pyspark
 
-EXPOSE 8888
+EXPOSE 8888 4040
 
 CMD jupyter lab --port-retries=0 --ip 0.0.0.0 --allow-root --IdentityProvider.token="" --ServerApp.password=""
