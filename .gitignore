@@ -1,5 +1,6 @@
 data/
 date/
+minio_data/
 
 /mongo_data
 *.csv
