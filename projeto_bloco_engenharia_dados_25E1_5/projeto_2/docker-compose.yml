@@ -4,13 +4,12 @@ networks:
     driver: bridge
 
 services:
-
   minio:
     image: minio/minio:latest
     container_name: minio
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -21,10 +20,12 @@ services:
       - sb_net
 
   pyspark:
-    build: .
+    build: ./docker
     container_name: pyspark
     environment:
       - JUPYTER_ENABLE_LAB=yes
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     ports:
       - '9999:8888'
       - '4040:4040'
@@ -32,7 +33,6 @@ services:
       - ./data:/work
     networks:
       - sb_net
-
   spark:
     image: docker.io/bitnami/spark:3.5
     container_name: spark
@@ -50,30 +50,9 @@ services:
       - ./data:/work
     networks:
       - sb_net
-  
-  spark-worker-1:
+      
+  spark-worker:
     image: docker.io/bitnami/spark:3.5
-    container_name: spark-work-1
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - SPARK_USER=spark
-    volumes:
-      - ./data:/work
-    networks:
-      - sb_net
-    depends_on:
-      - spark
-  
-  spark-worker-2:
-    image: docker.io/bitnami/spark:3.5
-    container_name: spark-work-2
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark:7077
