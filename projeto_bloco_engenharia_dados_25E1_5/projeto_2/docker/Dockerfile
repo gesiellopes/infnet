@@ -9,8 +9,8 @@ RUN apt-get update && \
 
 WORKDIR /work
 
-RUN pip install jupyterlab -U
-RUN pip install pyspark
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 EXPOSE 8888 4040
 
